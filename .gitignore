@@ -1,0 +1,13 @@
+# Design documents are written and kept outside the repository: they propose
+# what will be, while the code, its header comments and the README say what is.
+docs/specs/
+
+# kode-sdk at the release tests/host_ao builds against, cloned there by its
+# CMakeLists.txt and never tracked.
+tests/host_ao/kode-sdk-*/
+
+# The editor's index (clangd), wherever a build directory leads it.
+.cache/
+
+# macOS
+.DS_Store

@@ -1,0 +1,15 @@
+menu "Robotics module SDK"
+
+    config ROBOTICS_AO_PRIORITY
+        int "Priority of the module's owner (0: KODE_PRIO_USER_HIGH)"
+        range 0 24
+        default 0
+        help
+            The QP/C priority of the Active Object that owns the Robotics
+            module, which is also its task's FreeRTOS priority. 0 takes
+            kode-sdk's KODE_PRIO_USER_HIGH; robotics_ao.c says why. Two Active
+            Objects at one level stop the board when the second starts, so
+            an app whose own Active Object needs KODE_PRIO_USER_HIGH moves
+            this one to a level nothing in its image holds.
+
+endmenu

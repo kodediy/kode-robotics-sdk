@@ -1,0 +1,21 @@
+version: "0.1.0"
+description: "The Robotics module (KDROB001) described: J3 positions, the bridge's facts, the PWM plan."
+url: "https://docs.kode.diy/modules/robotics"
+documentation: "https://docs.kode.diy/modules/robotics"
+repository: "https://github.com/kodediy/kode-robotics-sdk.git"
+issues: "https://github.com/kodediy/kode-robotics-sdk/issues"
+discussion: "https://github.com/kodediy/kode-robotics-sdk/discussions"
+repository_info:
+  path: "components/robotics_bsp"
+license: "GPL-3.0-or-later"
+targets:
+  - esp32p4
+tags:
+  - kode-dot
+  - robotics
+  - motor
+  - stepper
+  - servo
+
+dependencies:
+  idf: ">=6.1"

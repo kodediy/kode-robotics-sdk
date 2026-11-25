@@ -1,0 +1,71 @@
+name: Build or integration problem
+description: Fetching the SDK, resolving its components, configuring or linking a project against it.
+type: Bug
+assignees:
+  - vmlorenzorod
+body:
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Before you file
+      options:
+        - label: I have searched the [open and closed issues](https://github.com/kodediy/kode-robotics-sdk/issues?q=is%3Aissue) and found nothing that covers this.
+          required: true
+        - label: My project builds with `kodediy/kode` alone, at the version this SDK pins, before `kodediy/robotics` is added.
+          required: true
+        - label: The problem survives deleting `build/`, `managed_components/`, `dependencies.lock` and the generated `sdkconfig`.
+          required: true
+
+  - type: textarea
+    id: manifest
+    attributes:
+      label: SDK pins
+      description: The `kodediy/kode` and `kodediy/robotics` entries of your `idf_component.yml`.
+      render: yaml
+    validations:
+      required: true
+
+  - type: input
+    id: idf_version
+    attributes:
+      label: ESP-IDF version
+      description: The output of `idf.py --version`, from the same shell that failed.
+      placeholder: ESP-IDF v6.1
+    validations:
+      required: true
+
+  - type: dropdown
+    id: host_os
+    attributes:
+      label: Host operating system
+      options:
+        - macOS (Apple silicon)
+        - macOS (Intel)
+        - Linux
+        - Windows
+    validations:
+      required: true
+
+  - type: textarea
+    id: command
+    attributes:
+      label: Command
+      description: Exactly what you ran, with every argument.
+      placeholder: idf.py build
+      render: shell
+    validations:
+      required: true
+
+  - type: textarea
+    id: output
+    attributes:
+      label: Output
+      description: The full output. The first error matters more than the last line, so do not trim the top.
+      render: text
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Anything else

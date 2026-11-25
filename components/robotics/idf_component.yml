@@ -1,0 +1,39 @@
+version: "0.1.0"
+description: "The Robotics module for Kode Dot apps: two DC motors, a stepper or four outputs, the servo connector, the I2C pair."
+url: "https://docs.kode.diy/modules/robotics"
+documentation: "https://docs.kode.diy/modules/robotics"
+repository: "https://github.com/kodediy/kode-robotics-sdk.git"
+issues: "https://github.com/kodediy/kode-robotics-sdk/issues"
+discussion: "https://github.com/kodediy/kode-robotics-sdk/discussions"
+repository_info:
+  path: "components/robotics"
+license: "GPL-3.0-or-later"
+targets:
+  - esp32p4
+tags:
+  - kode-dot
+  - robotics
+  - motor
+  - stepper
+  - servo
+
+## The SDK's examples, which the registry lists under this component.
+examples:
+  - path: ../../examples/console_actions
+  - path: ../../examples/i2c
+  - path: ../../examples/module
+  - path: ../../examples/motors
+  - path: ../../examples/outputs
+  - path: ../../examples/servos
+  - path: ../../examples/stepper
+
+## The standard layer's dependencies, and the entry point of this SDK's graph:
+## an app with a task pins kodediy/robotics and nothing else of this SDK, and
+## every layer below arrives at the same release through these entries.
+## kode-sdk is never pinned here: the app pins it (this SDK is built and tested
+## with v0.1.5), and kodediy/kode brings the layers below it at that release.
+dependencies:
+  idf: ">=6.1"
+  kodediy/robotics_aos: {version: "==0.1.0", override_path: "../robotics_aos"}
+  kodediy/robotics_drv: {version: "==0.1.0", override_path: "../robotics_drv"}
+  kodediy/robotics_bsp: {version: "==0.1.0", override_path: "../robotics_bsp"}

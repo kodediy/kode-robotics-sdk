@@ -1,0 +1,59 @@
+name: API proposal
+description: A new robotics_* call, or a change to an existing one.
+type: Feature
+assignees:
+  - vmlorenzorod
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The rules every call keeps: one owner holds the module, and every call asks it. A call of `robotics.h` says in its `@brief` whether it blocks, waits for at most the time it is given and returns `bool`, with `robotics_error()` for why. A call of `robotics_sys.h` never waits: a command returns `kode_status_t`, and a request takes the asking Active Object first and is answered with a signal. Nothing an app calls skips the pause before a reversal or the fault latch, and nothing moves until the app asks. A proposal that has to break one says why in **Risks**.
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Background and motivation
+      description: The problem this solves, who hits it and how they work around it today.
+    validations:
+      required: true
+
+  - type: textarea
+    id: api
+    attributes:
+      label: Proposed API
+      description: The declarations as they would appear in `robotics.h` and `robotics_sys.h`, each with its Doxygen `@brief`, `@param` and `@return`, and whether it blocks. For an event, the name and the signal.
+      render: c
+    validations:
+      required: true
+
+  - type: textarea
+    id: usage
+    attributes:
+      label: Usage
+      description: How an app would call it - a few lines of real code.
+      render: c
+    validations:
+      required: true
+
+  - type: dropdown
+    id: layer
+    attributes:
+      label: Layer
+      description: |
+        Knows a position, a connector pin or the PWM plan: robotics_bsp. Knows a part (AT8833) or an ESP-IDF peripheral: robotics_drv. Holds the module or decides when: robotics_aos. Is what a task calls: robotics. Is what an Active Object calls: robotics_sys.
+      multiple: true
+      options:
+        - robotics (the standard layer, robotics.h)
+        - robotics_sys (the extended layer, robotics_sys.h)
+        - robotics_aos
+        - robotics_drv
+        - robotics_bsp
+        - Not sure
+    validations:
+      required: true
+
+  - type: textarea
+    id: risks
+    attributes:
+      label: Risks
+      description: Breaking changes, current on the header's 5 V (USB or the battery's boost), an MCPWM or LEDC timer or channel that something else uses, RAM.

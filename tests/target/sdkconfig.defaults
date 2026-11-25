@@ -1,0 +1,27 @@
+# The target build's own settings. Everything about the board - flash, PSRAM,
+# cache, the console - arrives from kbsp's sdkconfig.board, which
+# CMakeLists.txt fetches and reads first. Do not copy any of it here.
+
+CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="managed_components/kodediy__kbsp/partitions.csv"
+
+# The role every consumer of the SDK builds in.
+CONFIG_KODEOS_BOOT_ROLE_APP=y
+
+# J3's 3.3 V, the module's supply, is switched by a pin of the Dot's C5, and
+# the owner asks for it with kode_sys_exp_power() when it starts (kode_sys.h,
+# "J3's module supply"): the switch goes over the link to the C5, so the
+# radio is on, as in kode-sdk's ir_remote example. WiFi and the stack above
+# it are not: nothing here opens a socket, and a WiFi scan holds the link -
+# the module's supply with it - for up to some 40 s. BLE is left at
+# kode-sdk's default.
+CONFIG_KODEOS_RADIO=y
+CONFIG_KODEOS_WIFI=n
+CONFIG_KODEOS_NET=n
+CONFIG_KODEOS_CHANNEL=n
+
+# The step alarm in internal RAM, as the stepper example builds it: the
+# #error in robotics_drv_stepper.c must not fire with these.
+CONFIG_GPTIMER_ISR_CACHE_SAFE=y
+CONFIG_GPTIMER_CTRL_FUNC_IN_IRAM=y
+CONFIG_GPIO_CTRL_FUNC_IN_IRAM=y
+CONFIG_MCPWM_CTRL_FUNC_IN_IRAM=y

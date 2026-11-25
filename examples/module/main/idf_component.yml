@@ -1,0 +1,24 @@
+## kode-sdk at its release v0.1.5 and the Robotics SDK from this
+## checkout. An app outside this repository pins kodediy/robotics (a task; an Active Object takes
+## kodediy/robotics_sys) from git instead, at a release:
+##
+##   kodediy/robotics:
+##     git: https://github.com/kodediy/kode-robotics-sdk.git
+##     path: components/robotics
+##     version: <tag>
+##
+## and robotics_aos, robotics_drv and robotics_bsp arrive at the same commit through its
+## own manifest.
+dependencies:
+  kodediy/kode:
+    git: https://github.com/kodediy/kode-sdk.git
+    path: components/kode
+    version: v0.1.5
+  kodediy/robotics:
+    override_path: "../../../components/robotics"
+  kodediy/robotics_aos:
+    override_path: "../../../components/robotics_aos"
+  kodediy/robotics_drv:
+    override_path: "../../../components/robotics_drv"
+  kodediy/robotics_bsp:
+    override_path: "../../../components/robotics_bsp"

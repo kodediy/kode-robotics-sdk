@@ -1,0 +1,27 @@
+version: "0.1.0"
+description: "The Robotics module's drivers: the AT8833 bridge, servo pulses, the step generator, the I2C scan."
+url: "https://docs.kode.diy/modules/robotics"
+documentation: "https://docs.kode.diy/modules/robotics"
+repository: "https://github.com/kodediy/kode-robotics-sdk.git"
+issues: "https://github.com/kodediy/kode-robotics-sdk/issues"
+discussion: "https://github.com/kodediy/kode-robotics-sdk/discussions"
+repository_info:
+  path: "components/robotics_drv"
+license: "GPL-3.0-or-later"
+targets:
+  - esp32p4
+tags:
+  - kode-dot
+  - robotics
+  - motor
+  - stepper
+  - servo
+
+## The module's facts, with kode_status_t and the log from kode-sdk.
+## Siblings: by path in this repo, at the same commit when fetched by git, and
+## at the same version from the registry. The version moves with every release.
+## kode-sdk is never pinned here: the app pins it (this SDK is built and tested
+## with v0.1.5), and kodediy/kode brings the layers below it at that release.
+dependencies:
+  idf: ">=6.1"
+  kodediy/robotics_bsp: {version: "==0.1.0", override_path: "../robotics_bsp"}

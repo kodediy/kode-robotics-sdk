@@ -1,0 +1,90 @@
+name: target-build
+
+# The SDK compiled and linked for the esp32p4, against the kode-sdk release
+# the projects pin, the way an app builds it: tests/target, which keeps every
+# call of both layers, and the seven examples. A file of its own rather than a
+# job in host-tests.yml: a real esp32p4 build takes minutes, and a slow check
+# folded into a fast one makes both worse. Same triggers and the same
+# paths-ignore list; workflow_dispatch is for a branch nobody has opened a
+# pull request for. Every build is a job of its own, so they run side by
+# side and one failing says nothing about the others.
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '**.md'
+      - '.github/ISSUE_TEMPLATE/**'
+      - '.github/workflows/assign.yml'
+  pull_request:
+    paths-ignore:
+      - '**.md'
+      - '.github/ISSUE_TEMPLATE/**'
+      - '.github/workflows/assign.yml'
+  workflow_dispatch:
+  # release.yml calls this as its gate, on the commit the tag names.
+  workflow_call:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: target-build-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  target:
+    name: tests/target${{ matrix.variant && format(' ({0})', matrix.variant) || '' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        # The build an app makes, and one variant on top of it
+        # (tests/target/sdkconfig.<name>). `lowpower` is the same build with
+        # CONFIG_KODE_LOWPOWER=y: no example sets it, so this is the only
+        # build for the chip of what the owner does when the board goes to
+        # sleep and wakes (robotics_ao.c).
+        variant: ['', lowpower]
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Build tests/target
+        uses: espressif/esp-idf-ci-action@e6f5c74232b1ccd4c97ed641f1e48553853f1fd5 # v1.2.0
+        with:
+          esp_idf_version: v6.1
+          target: esp32p4
+          path: tests/target
+          # After the full build, the internal RAM check: what the image puts
+          # in the 640 KB of internal RAM at link time, against
+          # tests/target/ram_budget.txt. A build that takes too much still
+          # links and still passes the host suites, and fails on a board - see
+          # tools/check_ram.sh. The variant is only asked to link.
+          command: |
+            ROBOTICS_TARGET_VARIANT=${{ matrix.variant }} idf.py build || exit 1
+            if [ -z "${{ matrix.variant }}" ]; then
+              ../../tools/check_ram.sh build/robotics_target.elf ram_budget.txt || exit 1
+            fi
+
+  examples:
+    name: examples/${{ matrix.example }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        example: [module, console_actions, motors, stepper, servos, outputs, i2c]
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Build the example
+        uses: espressif/esp-idf-ci-action@e6f5c74232b1ccd4c97ed641f1e48553853f1fd5 # v1.2.0
+        with:
+          esp_idf_version: v6.1
+          target: esp32p4
+          path: examples/${{ matrix.example }}
+          command: |
+            idf.py build || exit 1

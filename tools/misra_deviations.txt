@@ -1,0 +1,24 @@
+# The MISRA C:2012 rules this code base deviates from everywhere, each with
+# its reason. A cppcheck suppressions list, read by tools/check_misra.sh.
+#
+# A rule belongs here when the deviation is a decision about how the whole
+# SDK is written. A finding with a reason of its own is deviated on its line
+# instead, and everything else is counted by the project's baseline.
+#
+# The list is kode-sdk's own (tools/misra_deviations.txt) less the rule this
+# tree has no use for - 11.3, which is there for QP/C's event macros. When
+# the owner's Active Object is compiled and the baseline is taken again, a
+# 11.3 that shows up in code written on those macros is deviated here with
+# kode-sdk's reason, and not before: a deviation says what the code does.
+
+# Rule 15.5 (advisory): a function should have a single point of exit.
+# A function here refuses its bad arguments first and returns, one guard a
+# line, so the body below reads without nesting. A single exit would put the
+# whole body inside the guards' else branches.
+misra-c2012-15.5
+
+# Rule 21.6 (required): the standard library's input/output is not used.
+# Bounded formatting is snprintf(), into the buffer the console hands a
+# variable row, whose size is the second argument (robotics_console.c). Nothing
+# here opens a file or reads a stream.
+misra-c2012-21.6

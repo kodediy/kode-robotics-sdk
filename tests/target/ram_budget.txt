@@ -1,0 +1,59 @@
+# The budget of internal RAM for this project, read by tools/check_ram.sh:
+#
+#   ../../tools/check_ram.sh build/robotics_target.elf ram_budget.txt
+#
+# This project links kode-sdk at the release the tree pins (v0.1.5) with every
+# Robotics component on top - both layers, every call of robotics.h and
+# robotics_sys.h kept by main.c - and CONFIG_KODEOS_RADIO=y as every app of the
+# module needs it, so what it takes of the ESP32-P4's 640 KB of internal RAM
+# at link time is what an app that uses the module starts with. Nearly all of
+# it is kode-sdk's: the module's own statics come to about 11 KB, 8 of them
+# AO_Robotics's stack, the one line of its own below. The extended layer's
+# doors and subscribers are under 100 bytes; the standard layer's events task
+# (3072 bytes of stack, at KODE_PRIO_STANDARD_EVENTS) and its queue are made
+# at run time, from the heap, when the owner starts.
+#
+# static_max is the ceiling of that static image - code in IRAM, .data and
+# .bss. On kode-sdk v0.1.5 it takes 217232 bytes - some of them
+# esp_driver_mcpwm's, its compare and period calls kept in IRAM for the
+# stepper's alarm - and the ceiling is about 5 KB above. A change that needs
+# more either moves something to PSRAM or raises this number in the same
+# commit, where a reviewer sees it. kode-sdk's own target keeps its own.
+static_max 222000
+
+# Every data symbol of 2048 bytes or more in internal RAM, with the source
+# file that defines it and the most it may be. A static this size that is not
+# listed fails the check: a buffer belongs in PSRAM (khal_alloc_psram() in
+# kode-sdk), and the ones below are here because something forces them to be
+# internal. They are kode-sdk's and the libraries', listed at the size they
+# have so that a pin that moves and grows one is seen.
+#
+# symbol               source file          max bytes
+
+# AO_Robotics's stack: KQP_AO_STACK_BYTES, kode-sdk's default for an Active
+# Object, internal for the reason kode-sdk's own are. Its steps call no
+# deep library, so its high-water mark on a board may let it shrink.
+l_stack                robotics_ao.c        8192
+
+# The stacks of the system Active Objects this project starts (kqp_config.h's
+# tiers). Internal because an AO may write flash, which takes PSRAM out of
+# reach while the write lasts. An app with kodeOS's console
+# (CONFIG_KODEOS_CONSOLE, as the examples build) adds the console's.
+storage_stack          storage_ao.c         6144
+radio_stack            radio_ao.c           6144
+power_stack            power_ao.c           4096
+log_stack              log_ao.c             4096
+ioexp_stack            ioexp_ao.c           4096
+boot_stack             boot_ao.c            4096
+buttons_stack          buttons_ao.c         3072
+
+# QP/C's three event pools.
+s_jumbo_pool           kqp.c                16432
+s_medium_pool          kqp.c                16128
+s_large_pool           kqp.c                16128
+
+# What the libraries declare. Listed so that a version bump that grows one
+# of them is seen.
+xIsrStack              port.c               3072
+s_watch_stack          khal_system_esp.c    3072
+s_retention            sleep_retention.c    2724

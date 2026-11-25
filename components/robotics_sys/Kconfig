@@ -1,0 +1,16 @@
+menu "Robotics module SDK, extended layer"
+
+    config ROBOTICS_SIG_OFFSET
+        int "Where the Robotics signals start above MAX_SIG"
+        range 1000 60000
+        default 1100
+        help
+            robotics_sys.h's signals (the answers and the news) are posted,
+            never published, and live in a range of their own: from
+            MAX_SIG + this offset, for as many as the header lists. An app's
+            own signals are MAX_SIG to MAX_SIG + 999. The Mesh SDK takes 1000,
+            this one 1100, the Camera SDK 1200 and the F*CK SDK 1300, so an app
+            that uses two of them has no signal twice; change it only when
+            another library's range is in the way.
+
+endmenu

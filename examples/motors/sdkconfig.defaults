@@ -1,0 +1,28 @@
+# The example's own settings. Everything about the board - flash, PSRAM,
+# cache, the console - arrives from kbsp's sdkconfig.board, which
+# CMakeLists.txt fetches and reads first. Do not copy any of it here.
+
+CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="managed_components/kodediy__kbsp/partitions.csv"
+
+# An app, launched from kodeOS: any reset goes back home.
+CONFIG_KODEOS_BOOT_ROLE_APP=y
+
+# Kept, so the module can be watched from the console: `exp` prints
+# the header's fourteen positions, and the module's appear under "robotics".
+CONFIG_KODEOS_CONSOLE=y
+
+# J3's 3.3 V, the module's supply, is switched by a pin of the Dot's C5, and
+# its state when an app starts is not promised: robotics_begin() asks for it
+# on, over the link to the C5 (kode_sys.h, "J3's module supply"). So the radio
+# is ON here: AO_Radio owns the link, and the owner asks it to bring the link
+# up. What the link does not need is off: WiFi, and the
+# lwIP/HTTP/MQTT stack on top of it (about 395 kB of image), since nothing here
+# opens a socket and a WiFi scan holds the link - the module's supply with it -
+# for up to some 40 s. KODEOS_BLE stays at kode-sdk's default.
+CONFIG_KODEOS_RADIO=y
+CONFIG_KODEOS_WIFI=n
+CONFIG_KODEOS_NET=n
+
+# Nothing here draws, so the panel's shadow copy (402 KB of PSRAM, written by
+# every flush) would only ever hold a blank glass.
+CONFIG_KODEOS_SCREENSHOT=n

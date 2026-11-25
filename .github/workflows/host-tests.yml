@@ -1,0 +1,85 @@
+name: tests
+
+# Every pull request, and every push to main, and not at all for a change that
+# reaches no suite: the Markdown, the issue forms and the assign workflow.
+# README.md carries the pin of kode-sdk that check_example_pins.sh reads, but
+# that pin only moves together with the manifests, which are not ignored.
+# workflow_dispatch is for a branch nobody has opened a pull request for.
+# These suites need no module and no secrets: they build for ESP-IDF's `linux`
+# target and finish in a few minutes. The esp32p4 build is target-build.yml,
+# on purpose a file of its own.
+#
+# The suites compile against kode-sdk at the release tests/kode_sdk.cmake
+# names: one shallow `git clone` over https, kept beside tests/host_ao, for
+# kdefs' header, QP/C and the extended layer's headers, as the apps get them.
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '**.md'
+      - '.github/ISSUE_TEMPLATE/**'
+      - '.github/workflows/assign.yml'
+  pull_request:
+    paths-ignore:
+      - '**.md'
+      - '.github/ISSUE_TEMPLATE/**'
+      - '.github/workflows/assign.yml'
+  workflow_dispatch:
+  # release.yml calls this as its gate, on the commit the tag names.
+  workflow_call:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  host-tests:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      # The checks that need neither ESP-IDF nor a board, first: seconds, and
+      # the cheapest signal in the file. The tests of the RAM and MISRA gates
+      # stand in for the toolchain and for cppcheck, so they run here, without
+      # either. The RAM gate runs in target-build.yml, on the image it judges.
+      # The MISRA gate is not run here: it needs a baseline file, and only the
+      # tool itself is tested.
+      - name: Run the tools' own tests
+        run: |
+          set -e
+          bash tools/test_check_ram.sh
+          bash tools/test_check_misra.sh
+
+      # An example and the target build each compile against the
+      # kode-sdk their own manifest pins, and the README shows an app which one
+      # to use. One bump, every pin: no IDF, no network.
+      - name: Every project pins the same kode-sdk
+        run: tools/check_example_pins.sh || exit 1
+
+      - name: Run the host suites and the layer check
+        uses: espressif/esp-idf-ci-action@e6f5c74232b1ccd4c97ed641f1e48553853f1fd5 # v1.2.0
+        with:
+          esp_idf_version: v6.1
+          target: esp32p4
+          # Every step ends in `|| exit 1`: this block's status is its LAST
+          # command's, and without it a failed suite would hide behind a green
+          # layer check.
+          command: |
+            tools/host_tests.sh   || exit 1
+            tools/check_layers.sh || exit 1
+
+      # The same cases under AddressSanitizer and UBSan: a read past an array
+      # or a signed overflow passes the plain build and fails this one.
+      - name: Run the host suites under the sanitizers
+        uses: espressif/esp-idf-ci-action@e6f5c74232b1ccd4c97ed641f1e48553853f1fd5 # v1.2.0
+        with:
+          esp_idf_version: v6.1
+          target: esp32p4
+          command: |
+            tools/host_tests.sh --sanitize || exit 1

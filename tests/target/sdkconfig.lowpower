@@ -1,0 +1,16 @@
+# The `lowpower` variant of the target build (ROBOTICS_TARGET_VARIANT=lowpower):
+# the same project with kode-sdk's low power on. No example sets it, so this is
+# the only build for the chip of what the owner does when the board goes to
+# sleep and wakes: robotics_ao.c subscribes to the rounds and the states only
+# under CONFIG_KODE_LOWPOWER. It is asked to link, not to fit the RAM budget.
+CONFIG_KODE_LOWPOWER=y
+
+# Bluetooth and its console, as kode-sdk's ble_peripheral example turns them
+# on. kode-sdk v0.1.5 builds low power only with them: without Bluetooth,
+# radio_ao.c names KDRV_BLE_ITVL_SLOW outside its #if CONFIG_KODEOS_BLE; with
+# Bluetooth and no console over it, kode_sys_ble.c names the pairing's
+# constants, which exist only with the console's pairing.
+CONFIG_KODEOS_CONSOLE=y
+CONFIG_BT_ENABLED=y
+CONFIG_KODEOS_BLE=y
+CONFIG_KODEOS_BLE_CONSOLE=y

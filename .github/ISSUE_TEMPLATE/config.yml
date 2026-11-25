@@ -1,0 +1,14 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question or idea
+    url: https://github.com/kodediy/kode-robotics-sdk/discussions
+    about: How do I..., which layer is this for..., would it make sense to... Ask in Discussions; issues are for defects and agreed work.
+  - name: The Robotics module's documentation
+    url: https://docs.kode.diy/modules/robotics
+    about: What the module is, its connectors, its limits and how to plug it in.
+  - name: The Kode Dot's own SDK (kode_* calls)
+    url: https://github.com/kodediy/kode-sdk/issues/new/choose
+    about: A kode_* call that misbehaves with no Robotics plugged in is kode-sdk's.
+  - name: kodeOS bug or feature
+    url: https://github.com/kodediy/KodeOS/issues/new/choose
+    about: The launcher, the console verbs, OTA and the app manager live in KodeOS.

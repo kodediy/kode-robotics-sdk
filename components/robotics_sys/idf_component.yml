@@ -1,0 +1,29 @@
+version: "0.1.0"
+description: "The Robotics module for Kode Dot Active Objects: commands, requests with answers and the module's news, none of them waiting."
+url: "https://docs.kode.diy/modules/robotics"
+documentation: "https://docs.kode.diy/modules/robotics"
+repository: "https://github.com/kodediy/kode-robotics-sdk.git"
+issues: "https://github.com/kodediy/kode-robotics-sdk/issues"
+discussion: "https://github.com/kodediy/kode-robotics-sdk/discussions"
+repository_info:
+  path: "components/robotics_sys"
+license: "GPL-3.0-or-later"
+targets:
+  - esp32p4
+tags:
+  - kode-dot
+  - robotics
+  - motor
+  - stepper
+  - servo
+
+## The extended layer's dependencies: an app with an Active Object pins
+## kodediy/robotics_sys and nothing else of this SDK, and every layer below
+## arrives at the same release through these entries.
+## kode-sdk is never pinned here: the app pins it (this SDK is built and tested
+## with v0.1.5), and kodediy/kode brings the layers below it at that release.
+dependencies:
+  idf: ">=6.1"
+  kodediy/robotics_aos: {version: "==0.1.0", override_path: "../robotics_aos"}
+  kodediy/robotics_drv: {version: "==0.1.0", override_path: "../robotics_drv"}
+  kodediy/robotics_bsp: {version: "==0.1.0", override_path: "../robotics_bsp"}
